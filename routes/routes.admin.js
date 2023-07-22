@@ -1,28 +1,27 @@
 const express = require('express');
-const User = require("../model/user.model")
+const Admin = require("../model/admin.model")
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const adminRouter = express.Router();
 
-const userRouter = express.Router();
-
-userRouter.post("/register", async (req, res) => {
+adminRouter.post("/register", async (req, res) => {
     try {
-        const userInfo = req.body
-        console.log(userInfo)
+        const adminInfo = req.body
+        console.log(adminInfo)
 
-        bcrypt.hash(userInfo.password, 10).then((encryptedPassword) => {
+        bcrypt.hash(adminInfo.password, 10).then((encryptedPassword) => {
             console.log(encryptedPassword)
-            const user = new User({
-                username: userInfo.username,
-                email: userInfo.email,
+            const admin = new Admin({
+                username: adminInfo.username,
+                email: adminInfo.email,
                 password: encryptedPassword
             })
-            console.log(user)
-            user.save().then(newUser => {
-                console.log(newUser)
+            console.log(admin)
+            admin.save().then(newAdmin => {
+                console.log(newAdmin)
                 res.status(201).json({
                     message: "Encryption Successfull",
-                    data: newUser
+                    data: newAdmin
                 })
             })
                 .catch(err => {
@@ -35,28 +34,28 @@ userRouter.post("/register", async (req, res) => {
     }
     catch (err) {
         res.json({
-            message: "Failed to create new user",
+            message: "Failed to create new admin",
             error: err
         })
     }
 })
 
-userRouter.post('/login', (req, res) => {
-    const userInfo = req.body
-    console.log(userInfo)
-    User.findOne({ email: userInfo.email }).then(user => {
-        console.log(user)
-        console.log(userInfo.email)
-        console.log(user.email)
-        if (user) {
-            return bcrypt.compare(userInfo.password, user.password).then(authStatus => {
-                console.log(userInfo.password)
-                console.log(user.password)
+adminRouter.post('/login', (req, res) => {
+    const adminInfo = req.body
+    console.log(adminInfo)
+    Admin.findOne({ email: adminInfo.email }).then(admin => {
+        console.log(admin)
+        console.log(adminInfo.email)
+        console.log(admin.email)
+        if (admin) {
+            return bcrypt.compare(adminInfo.password, admin.password).then(authStatus => {
+                console.log(adminInfo.password)
+                console.log(admin.password)
                 console.log(authStatus)
                 if (authStatus) {
                     return jwt.sign({
-                        email: user.email,
-                        id: user._id
+                        email: admin.email,
+                        id: admin._id
                     },
                         `${process.env.SECRET_KEY}`,
                         {
@@ -86,4 +85,4 @@ userRouter.post('/login', (req, res) => {
     })
 })
 
-module.exports = userRouter;
+module.exports = adminRouter;
