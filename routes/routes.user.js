@@ -56,7 +56,8 @@ userRouter.post('/login', (req, res) => {
                 if (authStatus) {
                     return jwt.sign({
                         email: user.email,
-                        id: user._id
+                        id: user._id,
+                        role : user.role
                     },
                         `${process.env.SECRET_KEY}`,
                         {
